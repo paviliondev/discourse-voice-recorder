@@ -1,0 +1,19 @@
+{
+  "about_url": "https://github.com/paviliondev/discourse-voice-recorder.git",
+  "license_url": null,
+  "authors": "Angus McLeod",
+  "theme_version": "0.1.0",
+  "assets": {
+  },
+  "name": "Voice Recorder",
+  "component": true,
+  "modifiers": {
+    "csp_extensions": [
+      "worker-src: blob:",
+      "script-src: https://cdn.jsdelivr.net/npm/microm@0.2.4/dist/microm.min.js"
+    ],
+    "svg_icons": [
+      "microphone"
+    ]
+  }
+}
