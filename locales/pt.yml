@@ -1,8 +1,8 @@
 pt:
   composer:
-    composer_audio_upload_button_title: "Record & upload audio file"
+    composer_audio_upload_button_title: "Gravar & enviar arquivo de áudio"
   composer_audio_upload:
-    button_text: "Record & upload audio"
-    title: "Record & upload audio"
+    button_text: "Gravar & enviar áudio"
+    title: "Gravar & enviar áudio"
   theme_metadata:
-    description: "Add voice recordings to posts"
+    description: "Adicionar gravações de voz às publicações"
