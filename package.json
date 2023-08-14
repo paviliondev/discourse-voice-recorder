@@ -3,5 +3,9 @@
   "license": "MIT",
   "devDependencies": {
     "eslint-config-discourse": "latest"
+  },
+  "component": true,
+  "modifiers": {
+    "csp_extensions": ["script-src: https://cdn.jsdelivr.net/npm/microm@0.2.4/dist/microm.min.js"]
   }
 }

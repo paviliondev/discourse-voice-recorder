@@ -37,6 +37,6 @@
 {{/d-modal-body}}
 
 <div class="modal-footer">
-  {{d-button action="uploadFile" class='btn-primary' icon=uploadIcon label='upload' disabled=disallowUpload}}
+  {{d-button action=(action "uploadFile") class='btn-primary' icon=uploadIcon label='upload' disabled=disallowUpload}}
   {{d-modal-cancel close=(action "closeModal")}}
 </div>

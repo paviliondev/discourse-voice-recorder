@@ -177,11 +177,5 @@ export default Controller.extend(ModalFunctionality, {
 
       }
     },
-
-    closeModal() {
-      if (this.state === 'idle') {
-        this.get("modal").send("closeModal");
-      }
-    }
   }
 });
