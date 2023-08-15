@@ -12,11 +12,6 @@ function padStart(s, l, char) {
   return s;
 }
 
-function stopStream(stream) {
-  stream.getAudioTracks().forEach(track => track.stop());
-}
-
-
 export default Controller.extend(ModalFunctionality, {
   state: 'idle', // 'idle', 'recording', 'recording_start', 'playing', 'processing'
   isRecording: equal('state', 'recording'),
@@ -67,6 +62,7 @@ export default Controller.extend(ModalFunctionality, {
   },
 
   _recorder: null,
+  _chunks: [],
   _audioData: null,
   _audioEl: null,
   _stream: null,
@@ -76,7 +72,7 @@ export default Controller.extend(ModalFunctionality, {
     return uploadIcon(this.currentUser.staff, this.siteSettings);
   },
 
-  _clearRecording: function () {
+  _clearRecording() {
     this._recorder = null;
     this.set('_audioData', null);
     if (this._audioEl) {
@@ -85,74 +81,78 @@ export default Controller.extend(ModalFunctionality, {
     }
   },
 
-  init: function () {
-    this._super();
-  },
-
-  onShow: function () {
+  onShow() {
     this._clearRecording();
   },
 
+  onDataAvailable(e) {
+    this._chunks.push(e.data);
+  },
+
+  onLoadedMetdata() {
+    this._audioEl.currentTime = 48 * 3600;
+  },
+
+  onTimeUpdate() {
+    this._audioEl.currentTime = 0;
+    this.set('state', 'idle');
+  },
+
+  onStop() {
+    let blob = new Blob(this._chunks, { type: "audio/ogg; codecs=opus" });
+    blob.name = 'recording.mp3';
+    blob.lastModifiedDate = new Date();
+    this._chunks = [];
+
+    let audio = document.createElement('audio');
+    audio.style.display = 'none';
+    audio.ontimeupdate = this.onTimeUpdate.bind(this);
+    audio.onloadedmetadata = this.onLoadedMetdata.bind(this);
+
+    this.setProperties({
+      "_audioEl": audio,
+      "_audioData": blob
+    });
+
+    audio.src = window.URL.createObjectURL(blob);
+  },
+
   actions: {
-    uploadFile: function () {
+    uploadFile() {
       if (!this._audioData) {
         this.flash('You have to record something!', 'error');
         return;
       }
-
       this.appEvents.trigger(`composer:add-files`, [this._audioData]);
       this.send('closeModal');
     },
 
-    startStopRecording: function () {
+    startStopRecording() {
       if (this.state === 'idle') {
         this._clearRecording();
 
-        this._recorder = new Microm();
-        this._recorder.record()
+        navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
           this._stream = stream;
+
+          this._recorder = new MediaRecorder(stream);
+          this._recorder.ondataavailable = this.onDataAvailable.bind(this);
+          this._recorder.onstop = this.onStop.bind(this);
+          this._recorder.start();
+
           this.set('state', 'recording_start');
           setTimeout(() => { this.set('state', 'recording'); }, 1050);
         }).catch(err => {
           this.flash('An error occured. Did you enable voice recording in your browser?');
           console.error(err);
         });
-
-
       } else if (this.state === 'recording') {
-
         this.set('state', 'processing');
-
-        this._recorder.stop()
-        .then(result => {
-          let blob = result.blob;
-          blob.name = 'recording.mp3';
-          blob.lastModifiedDate = new Date();
-
-          let audio = document.createElement('audio');
-          audio.style.display = 'none';
-
-          $(audio).on('ended', () => {
-            this.set('state', 'idle');
-          })
-          .one('timeupdate', () => {
-            audio.currentTime = 0;
-            this.set('_audioEl', audio);
-            this.set('_audioData', blob);
-            this.set('state', 'idle');
-            stopStream(this._stream);
-          })
-          .on('loadedmetadata', () => {
-            audio.currentTime = 48 * 3600;
-          });
-
-          audio.src = result.url;
-        });
+        this._recorder.stop();
       }
     },
 
-    startStopPlayback: function () {
+    startStopPlayback() {
       if (this.state === 'idle') {
 
         let audio = this._audioEl;
