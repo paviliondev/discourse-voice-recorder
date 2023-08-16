@@ -36,20 +36,6 @@ export default Controller.extend(ModalFunctionality, {
     return state !== 'idle';
   },
 
-  @discourseComputed('_audioEl')
-  recordingDuration(audio) {
-    if (audio) {
-      let secs = audio.duration * 1000;
-      if(secs < 1000) {
-        return '< 1s';
-      } else {
-        let d = moment.duration(secs);
-        return Math.floor(d.asMinutes()) + ':' + padStart(d.seconds(), 2, '0');
-      }
-    }
-    return '-';
-  },
-
   @discourseComputed('_audioData')
   recordingSize(data) {
     if (data) {
@@ -89,32 +75,22 @@ export default Controller.extend(ModalFunctionality, {
     this._chunks.push(e.data);
   },
 
-  onLoadedMetdata() {
-    this._audioEl.currentTime = 48 * 3600;
-  },
-
-  onTimeUpdate() {
-    this._audioEl.currentTime = 0;
-    this.set('state', 'idle');
-  },
-
   onStop() {
-    let blob = new Blob(this._chunks, { type: "audio/ogg; codecs=opus" });
+    let blob = new Blob(this._chunks, { type: this._recorder.mimeType });
     blob.name = 'recording.mp3';
     blob.lastModifiedDate = new Date();
     this._chunks = [];
 
     let audio = document.createElement('audio');
-    audio.style.display = 'none';
-    audio.ontimeupdate = this.onTimeUpdate.bind(this);
-    audio.onloadedmetadata = this.onLoadedMetdata.bind(this);
+    audio.setAttribute("preload", "metadata");
+    audio.setAttribute("controls", "true");
+    audio.src = window.URL.createObjectURL(blob);
 
     this.setProperties({
       "_audioEl": audio,
-      "_audioData": blob
+      "_audioData": blob,
+      "state": "idle"
     });
-
-    audio.src = window.URL.createObjectURL(blob);
   },
 
   actions: {
@@ -132,49 +108,24 @@ export default Controller.extend(ModalFunctionality, {
         this._clearRecording();
 
         navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-          this._stream = stream;
-
-          this._recorder = new MediaRecorder(stream);
-          this._recorder.ondataavailable = this.onDataAvailable.bind(this);
-          this._recorder.onstop = this.onStop.bind(this);
-          this._recorder.start();
-
-          this.set('state', 'recording_start');
-          setTimeout(() => { this.set('state', 'recording'); }, 1050);
-        }).catch(err => {
-          this.flash('An error occured. Did you enable voice recording in your browser?');
-          console.error(err);
-        });
+          .then(stream => {
+            this._stream = stream;
+            this._recorder = new MediaRecorder(stream);
+            this._recorder.ondataavailable = this.onDataAvailable.bind(this);
+            this._recorder.onstop = this.onStop.bind(this);
+            this._recorder.start();
+            this.set('state', 'recording_start');
+            setTimeout(() => { this.set('state', 'recording'); }, 1050);
+          }).catch(err => {
+            this.flash('An error occured. Did you enable voice recording in your browser?');
+            console.error(err);
+          });
       } else if (this.state === 'recording') {
         this.set('state', 'processing');
         this._recorder.stop();
-      }
-    },
-
-    startStopPlayback() {
-      if (this.state === 'idle') {
-
-        let audio = this._audioEl;
-
-        audio.currentTime = 0;
-
-        let promise = audio.play();
-        if (promise && promise.then) {
-          promise.then(() => {
-            this.set('state', 'playing');
-          })
-          .catch((err) => { console.error(err); });
-
-        } else {
-          this.set('state', 'playing');
-        }
-
-      } else if (this.state === 'playing') {
-
-        this._audioEl.pause();
-        this.set('state', 'idle');
-
+        this._stream.getTracks().forEach((track) => {
+          track.stop();
+        });
       }
     },
   }

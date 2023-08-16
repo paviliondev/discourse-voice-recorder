@@ -8,3 +8,31 @@
     opacity: 0.5;
   }
 }
+
+.composer-audio-upload-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+
+  button {
+    width: 100%;
+  }
+}
+
+.composer-audio-upload-audio {
+  min-height: 100px;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  audio {
+    width: 100%;
+  }
+}
+
+.composer-audio-upload-metadata {
+  min-height: 25px;
+  display: flex;
+  align-items: center;
+}
