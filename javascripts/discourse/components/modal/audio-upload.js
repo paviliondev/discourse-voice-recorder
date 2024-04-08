@@ -4,14 +4,6 @@ import { action } from "@ember/object";
 import { equal, notEmpty } from "@ember/object/computed";
 import { uploadIcon } from "discourse/lib/uploads";
 
-function padStart(s, l, char) {
-  let n = l - String(s).length;
-  for (let i = 0; i < n; ++i) {
-    s = char + s;
-  }
-  return s;
-}
-
 export default class AudioUpload extends Component {
   @tracked state = "idle"; // 'idle', 'recording', 'recording_start', 'playing', 'processing'
   @tracked flash;
