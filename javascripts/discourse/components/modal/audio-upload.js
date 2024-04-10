@@ -14,6 +14,7 @@ function padStart(s, l, char) {
 
 export default class AudioUpload extends Component {
   @tracked state = "idle"; // 'idle', 'recording', 'recording_start', 'playing', 'processing'
+  @tracked flash;
 
   @equal("state", "recording") isRecording;
   @equal("state", "recording_start") isRecordingStart;
@@ -99,7 +100,7 @@ export default class AudioUpload extends Component {
   @action
   uploadFile() {
     if (!this._audioData) {
-      this.flash("You have to record something!", "error");
+      this.flash = "You have to record something!";
       return;
     }
     this.appEvents.trigger(`composer:add-files`, [this._audioData]);
@@ -120,14 +121,14 @@ export default class AudioUpload extends Component {
           this._recorder.onstop = this.onStop.bind(this);
           this._recorder.start();
           this.state = "recording_start";
+          this.flash = "";
           setTimeout(() => {
             this.state = "recording";
           }, 1050);
         })
         .catch((err) => {
-          this.flash(
-            "An error occured. Did you enable voice recording in your browser?"
-          );
+          this.flash =
+            "An error occured. Did you enable voice recording in your browser?";
           console.error(err);
         });
     } else if (this.state === "recording") {
