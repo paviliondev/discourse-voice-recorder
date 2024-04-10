@@ -3,6 +3,7 @@ import Component from "@ember/component";
 import { action } from "@ember/object";
 import { equal, notEmpty } from "@ember/object/computed";
 import { uploadIcon } from "discourse/lib/uploads";
+import I18n from "discourse-i18n";
 
 export default class AudioUpload extends Component {
   @tracked state = "idle"; // 'idle', 'recording', 'recording_start', 'playing', 'processing'
@@ -92,7 +93,7 @@ export default class AudioUpload extends Component {
   @action
   uploadFile() {
     if (!this._audioData) {
-      this.flash = "You have to record something!";
+      this.flash = I18n.t(themePrefix("composer_audio.error.no_record"));
       return;
     }
     this.appEvents.trigger(`composer:add-files`, [this._audioData]);
@@ -119,8 +120,7 @@ export default class AudioUpload extends Component {
           }, 1050);
         })
         .catch((err) => {
-          this.flash =
-            "An error occured. Did you enable voice recording in your browser?";
+          this.flash = I18n.t(themePrefix("composer_audio.error.failed"));
           console.error(err);
         });
     } else if (this.state === "recording") {
