@@ -1,8 +1,23 @@
 en:
   composer:
-    composer_audio_upload_button_title:  "Record & upload audio file"
+    composer_audio_upload_button_title: "Record & upload audio file"
   composer_audio_upload:
     button_text: "Record & upload audio"
     title: "Record & upload audio"
+  composer_audio:
+    action:
+      start_recording: "Start recording"
+      stop_recording: "Stop recording"
+    state:
+      recording_start: "Initializing audio recording..."
+      recording: "Recording in progress, speak now :-)"
+      processing: "Processing audio data, please wait..."
+      uploading: "Uploading audio file"
+      no_recording: "Nothing has been recorded yet"
+    metadata:
+      size: "Size: %{size}"
+    error:
+      no_record: "You have to record something!"
+      failed: "An error occured. Did you enable voice recording in your browser?"
   theme_metadata:
     description: "Add voice recordings to posts"
