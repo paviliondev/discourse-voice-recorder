@@ -4,15 +4,13 @@
   "authors": "Angus McLeod",
   "theme_version": "0.1.0",
   "assets": {
+    "audiorecorder": "/assets/audiorecorder.js",
+    "mp3worker": "/assets/mp3worker.js"
   },
   "name": "Voice Recorder",
   "component": true,
   "modifiers": {
-    "csp_extensions": [
-      "worker-src: blob:"
-    ],
-    "svg_icons": [
-      "microphone"
-    ]
+    "csp_extensions": ["worker-src: blob:"],
+    "svg_icons": ["microphone"]
   }
 }

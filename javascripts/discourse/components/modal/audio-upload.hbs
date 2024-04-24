@@ -5,6 +5,7 @@
   @dismissable={{false}}
   @flash={{this.flash}}
   {{did-insert this.onShow}}
+  {{will-destroy this.onCancelRecording}}
 >
   <:body>
     <div class="composer-audio-upload-buttons">
@@ -24,7 +25,11 @@
       />
     </div>
     <div class="composer-audio-upload-audio">
-      {{#if this.isProcessing}}
+      {{#if this.isLoading}}
+        <span class="wait-text">{{~htmlSafe
+            (theme-i18n "composer_audio.state.loading")
+          ~}}</span>
+      {{else if this.isProcessing}}
         <span class="wait-text">{{~htmlSafe
             (theme-i18n "composer_audio.state.processing")
           ~}}</span>

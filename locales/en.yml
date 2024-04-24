@@ -9,6 +9,7 @@ en:
       start_recording: "Start recording"
       stop_recording: "Stop recording"
     state:
+      loading: "Loading..."
       recording_start: "Initializing audio recording..."
       recording: "Recording in progress, speak now :-)"
       processing: "Processing audio data, please wait..."
